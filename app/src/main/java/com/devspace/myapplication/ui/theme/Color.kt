@@ -2,10 +2,10 @@ package com.devspace.myapplication.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Red80 = Color(0xFFFFCDD2) // Vermelho claro para o tema dark
-val RedGrey80 = Color(0xFFE1BEE7) // Cinza avermelhado claro para o tema dark
-val RedAccent80 = Color(0xFFFF8A80) // Acento vermelho claro para o tema dark
+val Orange80 = Color(0xFFFF7525) // Vermelho claro para o tema dark
+val OrangeGray80 = Color(0xFFFFF2E9) // Cinza avermelhado claro para o tema dark
+val OrangeAccent80 = Color(0xFFFFF2E9) // Acento vermelho claro para o tema dark
 
-val Red40 = Color(0xFFD32F2F) // Vermelho para o tema light
-val RedGrey40 = Color(0xFFBDBDBD) // Cinza avermelhado para o tema light
-val RedAccent40 = Color(0xFFFF5252) // Acento vermelho para o tema light
+val Orange40 = Color(0xFFFF7525) // Vermelho para o tema light
+val OrangeGray40 = Color(0xFFFFF2E9) // Cinza avermelhado para o tema light
+val OrangeAccent40 = Color(0xFFFF7525) // Acento vermelho para o tema light
