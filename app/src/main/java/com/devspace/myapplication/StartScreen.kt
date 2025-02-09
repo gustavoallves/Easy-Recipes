@@ -19,7 +19,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
@@ -27,7 +26,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.devspace.myapplication.ui.theme.EasyRecipesTheme
-import com.devspace.myapplication.ui.theme.poppinsFontFamily
 
 @Composable
 fun StartScreen() {
@@ -40,7 +38,6 @@ fun StartScreen() {
 
 @Composable
 fun StartScreenContent(
-    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     Surface(
@@ -58,7 +55,7 @@ fun StartScreenContent(
                 modifier = Modifier
                     .size(300.dp),
                 painter = painterResource(R.drawable.cook_startscreen_image),
-                contentDescription = "teste"
+                contentDescription = "Cook Illustration"
             )
             Text(
 //                fontFamily = poppinsFontFamily,
