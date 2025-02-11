@@ -3,6 +3,7 @@ package com.devspace.myapplication
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -35,18 +37,23 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.devspace.myapplication.ui.theme.EasyRecipesTheme
+import com.devspace.myapplication.ui.theme.poppinsFontFamily
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import retrofit2.http.Query
 
 @Composable
-fun MainScreen() {
+fun MainScreen(navController: NavController) {
 
     var recipes by rememberSaveable { mutableStateOf<List<RecipeDto>>(emptyList()) }
     val retrofit = RetrofitClient.retrofitInstance.create(APIService::class.java)
@@ -74,13 +81,42 @@ fun MainScreen() {
         modifier = Modifier
             .fillMaxSize()
     ) {
-
+        MainContent(
+            recipes = recipes,
+            modifier = Modifier,
+            onClick = { Unit }
+        )
     }
 }
 
 @Composable
-fun MainContent() {
+fun MainContent(
+    modifier: Modifier,
+    recipes: List<RecipeDto>,
+    onClick: (RecipeDto) -> Unit
+) {
+    Column(modifier = Modifier.fillMaxSize()) {
 
+        var query by remember { mutableStateOf("") }
+
+        PopularSession(
+            label0 = "Discover your\nfavorite recipes!",
+            label1 = "Popular recipes",
+            recipes = recipes,
+            onClick = onClick
+        )
+        SearchSession(
+            query = query,
+            onQueryChange = { newQuery ->
+                query = newQuery
+            }
+        )
+        RecipeSession(
+            label = "All recipes",
+            recipes = recipes,
+            onClick = onClick
+        )
+    }
 }
 
 @Composable
@@ -93,11 +129,12 @@ fun PopularSession(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 45.dp)
+            .padding(top = 25.dp)
     ) {
         Text(
             modifier = Modifier
                 .padding(start = 20.dp, end = 20.dp),
+            fontFamily = poppinsFontFamily,
             fontSize = 30.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary,
@@ -107,6 +144,7 @@ fun PopularSession(
             modifier = Modifier
                 .padding(start = 20.dp, end = 20.dp),
             fontSize = 20.sp,
+            fontFamily = poppinsFontFamily,
             fontWeight = FontWeight.Medium,
             text = label1
         )
@@ -117,7 +155,7 @@ fun PopularSession(
                 .padding(top = 5.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            recipes.forEach{ recipe ->
+            recipes.forEach { recipe ->
                 RecipeItem(
                     recipe = recipe,
                     onClick = onClick
@@ -129,6 +167,18 @@ fun PopularSession(
 }
 
 @Composable
+fun SearchSession(
+    query: String,
+    onQueryChange: (String) -> Unit
+) {
+    SearchBarUI(
+        query = query,
+        onQueryChange = onQueryChange,
+        placeholder = "Search..."
+    )
+}
+
+@Composable
 fun RecipeSession(
     label: String,
     recipes: List<RecipeDto>,
@@ -137,6 +187,7 @@ fun RecipeSession(
     Text(
         modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 16.dp),
         fontSize = 20.sp,
+        fontFamily = poppinsFontFamily,
         fontWeight = FontWeight.Medium,
         text = label
     )
@@ -147,7 +198,7 @@ fun RecipeSession(
 }
 
 @Composable
-fun RecipeList(
+private fun RecipeList(
     modifier: Modifier = Modifier,
     recipes: List<RecipeDto>,
     onClick: (RecipeDto) -> Unit
@@ -177,16 +228,26 @@ fun RecipeItem(
 ) {
     Box(
         modifier = Modifier
-            .width(179.dp)
-            .height(152.dp)
-            .clip(shape = RoundedCornerShape(12.dp)),
+            .width(180.dp)
+            .height(170.dp)
+            .clip(shape = RoundedCornerShape(12.dp))
+            .clickable {
+                onClick.invoke(recipe)
+            }
     ) {
+
+        AsyncImage(
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop,
+            model = recipe.image, contentDescription = "${recipe.title} Image"
+        )
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp)
-                .background(Color.Black)
+                .height(65.dp)
                 .alpha(0.5f)
+                .background(Color.Black)
                 .align(Alignment.BottomCenter)
         ) {
             Column(
@@ -197,8 +258,10 @@ fun RecipeItem(
                     text = recipe.title,
                     color = Color.White,
                     fontSize = 12.sp,
-//                fontFamily = R.font.poppins_medium,
-                    fontWeight = FontWeight.Medium
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Row(
                     modifier = Modifier
@@ -216,25 +279,18 @@ fun RecipeItem(
                         text = recipe.readyInMinutes.toString() + " min",
                         color = Color.White,
                         fontSize = 10.sp,
-//                fontFamily = R.font.poppins_medium,
+                        fontFamily = poppinsFontFamily,
                         fontWeight = FontWeight.Medium
                     )
                 }
             }
         }
-
-        AsyncImage(
-            modifier = Modifier
-                .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)),
-            contentScale = ContentScale.Crop,
-            model = recipe.image, contentDescription = "${recipe.title} Image"
-        )
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun MainScreenPreview() {
+private fun MainScreenPreview() {
     EasyRecipesTheme {
         val dummyRecipes = listOf(
             RecipeDto(

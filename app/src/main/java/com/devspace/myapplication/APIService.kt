@@ -14,5 +14,5 @@ interface APIService {
     fun getRecipeInfo(@Path("id") id: String): Call<RecipeDto>
 
     @GET("/recipes/complexSearch?")
-    fun searchRecipes(@Query("query") query: String): Call<Unit>
+    fun searchRecipes(@Query("query") query: String): Call<SearchRecipeResponse>
 }

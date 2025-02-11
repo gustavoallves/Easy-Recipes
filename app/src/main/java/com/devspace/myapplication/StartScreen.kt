@@ -25,19 +25,21 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.devspace.myapplication.ui.theme.EasyRecipesTheme
+import com.devspace.myapplication.ui.theme.poppinsFontFamily
 
 @Composable
-fun StartScreen() {
+fun StartScreen(navController: NavHostController) {
     StartScreenContent(
         onClick = {
-            Unit
+            navController.navigate("main_screen")
         }
     )
 }
 
 @Composable
-fun StartScreenContent(
+private fun StartScreenContent(
     onClick: () -> Unit
 ) {
     Surface(
@@ -58,7 +60,7 @@ fun StartScreenContent(
                 contentDescription = "Cook Illustration"
             )
             Text(
-//                fontFamily = poppinsFontFamily,
+                fontFamily = poppinsFontFamily,
                 fontWeight = FontWeight.Medium,
                 textAlign = TextAlign.Center,
                 fontSize = 20.sp,
@@ -82,7 +84,7 @@ fun StartScreenContent(
                 )
             ) {
                 Text(
-//                    fontFamily = poppinsFontFamily,
+                    fontFamily = poppinsFontFamily,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Medium,
                     color = Color.White,
