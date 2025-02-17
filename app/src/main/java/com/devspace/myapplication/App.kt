@@ -27,6 +27,7 @@ fun App() {
         ) {
             navBackStackEntry ->
                 val id = requireNotNull(navBackStackEntry.arguments?.getString("itemId"))
+                RecipeDetailScreen(id, navController)
         }
         composable(
             route = "search_recipe" + "/{query}",

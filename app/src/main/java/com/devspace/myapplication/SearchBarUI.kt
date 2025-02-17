@@ -1,7 +1,9 @@
 package com.devspace.myapplication
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -16,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
@@ -29,7 +32,8 @@ import com.devspace.myapplication.ui.theme.poppinsFontFamily
 fun SearchBarUI(
     query: String,
     onQueryChange: (String) -> Unit,
-    placeholder: String
+    placeholder: String,
+    onSearchClicked: () -> Unit
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusRequester = remember { FocusRequester() }
@@ -42,6 +46,7 @@ fun SearchBarUI(
             keyboardController?.hide()
             focusRequester.freeFocus()
             focusManager.clearFocus()
+            onSearchClicked.invoke()
         },
         active = false,
         onActiveChange = {},
@@ -58,16 +63,19 @@ fun SearchBarUI(
             Icon(
                 imageVector = Icons.Default.Search,
                 contentDescription = "Search Icon",
-                tint = MaterialTheme.colorScheme.primary
+                tint = colorScheme.primary
             )
         },
         trailingIcon = {
             Icon(
                 imageVector = Icons.Default.Close,
                 contentDescription = "Close Icon",
-                tint = MaterialTheme.colorScheme.primary
+                tint = colorScheme.primary
             )
         },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp)
     ) { }
 }
 
@@ -76,13 +84,15 @@ fun SearchBarUI(
 private fun SearchBarUIPreview() {
     Column(
         modifier = Modifier
+            .background(Color.DarkGray)
             .fillMaxSize()
             .padding(8.dp)
     ) {
         SearchBarUI(
             query = "",
             placeholder = "Search",
-            onQueryChange = {}
+            onQueryChange = {},
+            onSearchClicked = {},
         )
     }
 }

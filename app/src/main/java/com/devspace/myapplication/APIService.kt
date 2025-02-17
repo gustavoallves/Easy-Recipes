@@ -15,4 +15,5 @@ interface APIService {
 
     @GET("/recipes/complexSearch?")
     fun searchRecipes(@Query("query") query: String): Call<SearchRecipeResponse>
+
 }
