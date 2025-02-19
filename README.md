@@ -7,7 +7,7 @@ Funcionalidades
 - Pesquisa por receitas: Não encontrou o que estava buscando? Não tem problema, faça uma busca para obter exatamente o que precisa.
 
 ## :camera_flash: Screenshots
-<img src="https://github.com/user-attachments/assets/8148b361-017b-4799-8029-4f8df6439920" width=170/> <img src="https://github.com/user-attachments/assets/e96d6d9b-12f2-402c-930d-b7a96ff495b5" width=180/> <img src="https://github.com/user-attachments/assets/d49ba72f-044c-4867-9d80-53c8d3a90a10" width=180/> <img src="https://github.com/user-attachments/assets/d2214b50-be68-46fc-ac26-7b79aa1511f3" width=180/>
+<img src="https://github.com/user-attachments/assets/8148b361-017b-4799-8029-4f8df6439920" width=180/> <img src="https://github.com/user-attachments/assets/e96d6d9b-12f2-402c-930d-b7a96ff495b5" width=180/> <img src="https://github.com/user-attachments/assets/d49ba72f-044c-4867-9d80-53c8d3a90a10" width=180/> <img src="https://github.com/user-attachments/assets/d2214b50-be68-46fc-ac26-7b79aa1511f3" width=180/>
 
 
 ## Tecnologias
