@@ -63,7 +63,7 @@ fun RecipeDetailScreen(id: String, navHostController: NavHostController) {
             Log.d("MainActivity", "Network Error :: ${t.message}")
         }
     })
-    recipeDto?.let {
+    recipeDto?.let { recipe ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -89,8 +89,8 @@ fun RecipeDetailScreen(id: String, navHostController: NavHostController) {
                 modifier = Modifier
                     .height(305.dp),
                 contentScale = ContentScale.Crop,
-                model = it.image,
-                contentDescription = "${it.title} Image"
+                model = recipe.image,
+                contentDescription = "${recipe.title} Image"
             )
 
             Box(
@@ -111,7 +111,7 @@ fun RecipeDetailScreen(id: String, navHostController: NavHostController) {
                         fontWeight = FontWeight.Bold,
                         fontFamily = poppinsFontFamily,
                         color = MaterialTheme.colorScheme.primary,
-                        text = it.title
+                        text = recipe.title
                     )
                     Spacer(
                         modifier = Modifier
@@ -138,7 +138,7 @@ fun RecipeDetailScreen(id: String, navHostController: NavHostController) {
                             fontWeight = FontWeight.Medium,
                             fontFamily = poppinsFontFamily,
                             color = MaterialTheme.colorScheme.primary,
-                            text = it.readyInMinutes.toString() + " minutes"
+                            text = recipe.readyInMinutes.toString() + " minutes"
                         )
                     }
                     Spacer(
@@ -151,7 +151,7 @@ fun RecipeDetailScreen(id: String, navHostController: NavHostController) {
                         fontWeight = FontWeight.Bold,
                         fontFamily = poppinsFontFamily
                     )
-                    RecipeDetailContent(it)
+                    RecipeDetailContent(recipe)
                 }
             }
         }
@@ -161,7 +161,6 @@ fun RecipeDetailScreen(id: String, navHostController: NavHostController) {
 @Composable
 fun RecipeDetailContent(recipe: RecipeDto) {
     HtmlTextUI(
-        modifier = Modifier,
         text = recipe.summary
     )
 }

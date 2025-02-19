@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -40,6 +41,10 @@ fun SearchBarUI(
     val focusManager = LocalFocusManager.current
 
     SearchBar(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp)
+            .focusRequester(focusRequester),
         query = query,
         onQueryChange = onQueryChange,
         onSearch = {
@@ -72,11 +77,10 @@ fun SearchBarUI(
                 contentDescription = "Close Icon",
                 tint = colorScheme.primary
             )
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp)
-    ) { }
+        }
+    ) {
+
+    }
 }
 
 @Preview

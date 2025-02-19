@@ -18,9 +18,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -32,12 +34,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -46,6 +48,7 @@ import com.devspace.myapplication.ui.theme.poppinsFontFamily
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+
 
 @Composable
 fun SearchRecipeScreen(
@@ -73,17 +76,22 @@ fun SearchRecipeScreen(
     }
 
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.primary)
+                .height(50.dp)
+                .background(MaterialTheme.colorScheme.primary),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = { Unit }) {
+            IconButton(onClick = { navHostController.popBackStack() }) {
                 Icon(
-                    imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = "Back button"
+                    imageVector = Icons.Filled.KeyboardArrowLeft,
+                    contentDescription = "Arrow Back button",
+                    tint = Color.White
                 )
             }
             Text(
@@ -93,7 +101,9 @@ fun SearchRecipeScreen(
             )
         }
 
-        SearchRecipeContent(recipes = searchRecipes, onClick = { Unit })
+        SearchRecipeContent(recipes = searchRecipes, onClick = { itemClicked ->
+            navHostController.navigate(route = "recipe_detail/${itemClicked.id}")
+        })
     }
 }
 
@@ -110,10 +120,13 @@ fun SearchRecipeList(
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(1500.dp),
         contentPadding = PaddingValues(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        userScrollEnabled = false
     ) {
         items(recipes) {
             SearchRecipeItem(
@@ -128,18 +141,25 @@ private fun SearchRecipeItem(
     searchRecipeDto: SearchRecipeDto, onClick: (SearchRecipeDto) -> Unit
 ) {
     Box(modifier = Modifier
-        .width(179.dp)
-        .height(152.dp)
+        .width(180.dp)
+        .height(170.dp)
         .clip(shape = RoundedCornerShape(12.dp))
         .clickable {
             onClick.invoke(searchRecipeDto)
         }) {
+
+        AsyncImage(
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop,
+            model = searchRecipeDto.image,
+            contentDescription = "${searchRecipeDto.title} Image"
+        )
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp)
-                .background(Color.Black)
-                .alpha(0.5f)
+                .height(60.dp)
+                .background(Color.Black.copy(alpha = 0.5f))
                 .align(Alignment.BottomCenter)
         ) {
             Column(
@@ -150,7 +170,9 @@ private fun SearchRecipeItem(
                     color = Color.White,
                     fontSize = 12.sp,
                     fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -172,12 +194,5 @@ private fun SearchRecipeItem(
                 }
             }
         }
-
-        AsyncImage(
-            modifier = Modifier.clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)),
-            contentScale = ContentScale.Crop,
-            model = searchRecipeDto.image,
-            contentDescription = "${searchRecipeDto.title} Image"
-        )
     }
 }
