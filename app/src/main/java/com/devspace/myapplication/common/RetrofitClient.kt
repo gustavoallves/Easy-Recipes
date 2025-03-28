@@ -1,5 +1,6 @@
-package com.devspace.myapplication
+package com.devspace.myapplication.common
 
+import com.devspace.myapplication.BuildConfig
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import retrofit2.Retrofit

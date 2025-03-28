@@ -1,4 +1,4 @@
-package com.devspace.myapplication
+package com.devspace.myapplication.common.ui
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable

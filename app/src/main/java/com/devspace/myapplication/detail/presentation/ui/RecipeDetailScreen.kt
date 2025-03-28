@@ -1,4 +1,4 @@
-package com.devspace.myapplication
+package com.devspace.myapplication.detail.presentation.ui
 
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -39,6 +39,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.devspace.myapplication.APIService
+import com.devspace.myapplication.common.ui.HtmlTextUI
+import com.devspace.myapplication.R
+import com.devspace.myapplication.RecipeDto
+import com.devspace.myapplication.common.RetrofitClient
 import com.devspace.myapplication.ui.theme.poppinsFontFamily
 import retrofit2.Call
 import retrofit2.Callback
@@ -164,22 +169,3 @@ fun RecipeDetailContent(recipe: RecipeDto) {
         text = recipe.summary
     )
 }
-
-//@Preview
-//@Composable
-//private fun RecipeDetailPreview() {
-//    EasyRecipesTheme {
-//        val dummyRecipes =
-//            RecipeDto(
-//                1,
-//                "Recipe 1",
-//                "We make it easy to add a recipe search to your app or website - and not just any recipe search. Our semantic search is fast, accurate, and pretty darn smart. \"Gluten free nut free dessert without apples\"? Easy as pie. Or create your own recipe manager without making your users create tons of tags to find what they're looking for next time. It's all possible.\n" +
-//                        "Have your own recipe database? Great! Let us help you get it under control. With our API, your users will be able to find the recipes they want.",
-//                30,
-//                "https://spoonacular.com/recipeImages/634028-556x370.jpg"
-//            )
-//        RecipeDetailContent(
-//            recipe = dummyRecipes
-//        )
-//    }
-//}

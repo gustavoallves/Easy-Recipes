@@ -1,4 +1,4 @@
-package com.devspace.myapplication
+package com.devspace.myapplication.main.presentation.ui
 
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -45,6 +45,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.devspace.myapplication.APIService
+import com.devspace.myapplication.R
+import com.devspace.myapplication.RecipeDto
+import com.devspace.myapplication.RecipeResponse
+import com.devspace.myapplication.search.presentation.ui.components.SearchBarUI
+import com.devspace.myapplication.common.RetrofitClient
 import com.devspace.myapplication.ui.theme.EasyRecipesTheme
 import com.devspace.myapplication.ui.theme.poppinsFontFamily
 import retrofit2.Call
