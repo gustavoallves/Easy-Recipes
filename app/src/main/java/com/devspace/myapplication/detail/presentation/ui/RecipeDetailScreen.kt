@@ -1,6 +1,5 @@
 package com.devspace.myapplication.detail.presentation.ui
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -22,10 +21,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,35 +36,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import com.devspace.myapplication.APIService
 import com.devspace.myapplication.common.ui.HtmlTextUI
 import com.devspace.myapplication.R
-import com.devspace.myapplication.RecipeDto
-import com.devspace.myapplication.common.RetrofitClient
+import com.devspace.myapplication.common.RecipeDto
+import com.devspace.myapplication.detail.presentation.RecipeDetailViewModel
 import com.devspace.myapplication.ui.theme.poppinsFontFamily
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+
 
 @Composable
-fun RecipeDetailScreen(id: String, navHostController: NavHostController) {
+fun RecipeDetailScreen(recipeId: String, navHostController: NavHostController, recipeDetailViewModel: RecipeDetailViewModel) {
 
-    val service = RetrofitClient.retrofitInstance.create(APIService::class.java)
-    var recipeDto by remember { mutableStateOf<RecipeDto?>(null) }
+    val recipeDto by recipeDetailViewModel.uiRecipeDetail.collectAsState()
+    recipeDetailViewModel.fetchRecipeDetail(recipeId)
 
-    service.getRecipeInfo(id).enqueue(object : Callback<RecipeDto> {
-        override fun onResponse(call: Call<RecipeDto>, response: Response<RecipeDto>) {
-            if (response.isSuccessful) {
-                recipeDto = response.body()
-            } else {
-                Log.d("MainActivity", "Request Error :: ${response.errorBody()}")
-            }
-        }
-
-        override fun onFailure(call: Call<RecipeDto>, t: Throwable) {
-            Log.d("MainActivity", "Network Error :: ${t.message}")
-        }
-    })
     recipeDto?.let { recipe ->
         Column(
             modifier = Modifier
@@ -80,7 +61,9 @@ fun RecipeDetailScreen(id: String, navHostController: NavHostController) {
                     .height(50.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = {navHostController.popBackStack()
+                IconButton(onClick = {
+                    navHostController.popBackStack()
+                    recipeDetailViewModel.cleanRecipeId()
                 }) {
                     Icon(
                         imageVector = Icons.Filled.KeyboardArrowLeft,

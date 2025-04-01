@@ -1,6 +1,5 @@
 package com.devspace.myapplication.main.presentation.ui
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,11 +25,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,71 +43,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import com.devspace.myapplication.APIService
 import com.devspace.myapplication.R
-import com.devspace.myapplication.RecipeDto
-import com.devspace.myapplication.RecipeResponse
+import com.devspace.myapplication.common.RecipeDto
 import com.devspace.myapplication.search.presentation.ui.components.SearchBarUI
-import com.devspace.myapplication.common.RetrofitClient
+import com.devspace.myapplication.main.presentation.MainScreenViewModel
 import com.devspace.myapplication.ui.theme.EasyRecipesTheme
 import com.devspace.myapplication.ui.theme.poppinsFontFamily
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 @Composable
-fun MainScreen(navHostController: NavHostController) {
+fun MainScreen(navHostController: NavHostController, mainScreenViewModel: MainScreenViewModel) {
 
-    var recipes by rememberSaveable { mutableStateOf<List<RecipeDto>>(emptyList()) }
-    var popularRecipes by rememberSaveable { mutableStateOf<List<RecipeDto>>(emptyList()) }
-    val retrofit = RetrofitClient.retrofitInstance.create(APIService::class.java)
+    val randomRecipes by mainScreenViewModel.uiRandomRecipes.collectAsState()
+    val popularRecipes by mainScreenViewModel.uiPopularRecipes.collectAsState()
 
-    if (recipes.isEmpty()) {
-        retrofit.getRandomRecipes().enqueue(object : Callback<RecipeResponse> {
-            override fun onResponse(
-                call: Call<RecipeResponse>, response: Response<RecipeResponse>
-            ) {
-                if (response.isSuccessful) {
-                    recipes = response.body()?.recipes ?: emptyList()
-                } else {
-                    Log.d("MainAMainActivity", "Request Error :: ${response.errorBody()}")
-                }
-            }
-
-            override fun onFailure(call: Call<RecipeResponse>, t: Throwable) {
-                Log.d("MainActivity", "Network Error :: ${t.message}")
-            }
-
-        })
-    }
-
-    val recipesID = listOf(650855, 637932, 664636)
-    LaunchedEffect(key1 = true) {
-        val fetchedRecipes = mutableListOf<RecipeDto>()
-        recipesID.forEach { id ->
-            retrofit.getRecipeInfo(id.toString()).enqueue(object : Callback<RecipeDto> {
-                override fun onResponse(call: Call<RecipeDto>, response: Response<RecipeDto>) {
-                    if (response.isSuccessful) {
-                        response.body()?.let { fetchedRecipes.add(it) }
-                        if (fetchedRecipes.size == recipesID.size) {
-                            popularRecipes = fetchedRecipes.toList()
-                        }
-                    } else {
-                        Log.d("MainAMainActivity", "Request Error :: ${response.errorBody()}")
-                    }
-                }
-
-                override fun onFailure(call: Call<RecipeDto>, t: Throwable) {
-                    Log.d("MainActivity", "Network Error :: ${t.message}")
-                }
-            })
-        }
-    }
     Surface(
         modifier = Modifier.fillMaxSize()
     ) {
         MainContent(
-            recipes = recipes,
+            recipes = randomRecipes,
             onSearchClicked = { query ->
                 val tempCleanQuery = query.trim()
                 if (tempCleanQuery.isNotEmpty()) {

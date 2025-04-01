@@ -1,6 +1,5 @@
 package com.devspace.myapplication.search.presentation.ui
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,10 +27,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,41 +41,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import com.devspace.myapplication.APIService
 import com.devspace.myapplication.R
-import com.devspace.myapplication.SearchRecipeDto
-import com.devspace.myapplication.SearchRecipeResponse
-import com.devspace.myapplication.common.RetrofitClient
+import com.devspace.myapplication.common.RecipeDto
+import com.devspace.myapplication.search.presentation.SearchRecipeViewModel
 import com.devspace.myapplication.ui.theme.poppinsFontFamily
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-
 
 @Composable
 fun SearchRecipeScreen(
-    query: String, navHostController: NavHostController
+    query: String, navHostController: NavHostController, searchRecipeViewModel: SearchRecipeViewModel
 ) {
-    val service = RetrofitClient.retrofitInstance.create(APIService::class.java)
-    var searchRecipes by rememberSaveable { mutableStateOf<List<SearchRecipeDto>>(emptyList()) }
-
-    if (searchRecipes.isEmpty()) {
-        service.searchRecipes(query).enqueue(object : Callback<SearchRecipeResponse> {
-            override fun onResponse(
-                call: Call<SearchRecipeResponse>, response: Response<SearchRecipeResponse>
-            ) {
-                if (response.isSuccessful) {
-                    searchRecipes = response.body()?.results ?: emptyList()
-                } else {
-                    Log.d("MainActivity", "Request Error :: ${response.errorBody()}")
-                }
-            }
-
-            override fun onFailure(call: Call<SearchRecipeResponse>, t: Throwable) {
-                Log.d("MainActivity", "Network Error :: ${t.message}")
-            }
-        })
-    }
+    val searchRecipes by searchRecipeViewModel.uiSearchRecipe.collectAsState()
+    searchRecipeViewModel.fetchSearchRecipe(query)
 
     Column(
         modifier = Modifier
@@ -114,14 +87,14 @@ fun SearchRecipeScreen(
 
 @Composable
 private fun SearchRecipeContent(
-    recipes: List<SearchRecipeDto>, onClick: (SearchRecipeDto) -> Unit
+    recipes: List<RecipeDto>, onClick: (RecipeDto) -> Unit
 ) {
     SearchRecipeList(recipes, onClick)
 }
 
 @Composable
 fun SearchRecipeList(
-    recipes: List<SearchRecipeDto>, onClick: (SearchRecipeDto) -> Unit
+    recipes: List<RecipeDto>, onClick: (RecipeDto) -> Unit
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -135,7 +108,7 @@ fun SearchRecipeList(
     ) {
         items(recipes) {
             SearchRecipeItem(
-                searchRecipeDto = it, onClick = onClick
+                recipe = it, onClick = onClick
             )
         }
     }
@@ -143,21 +116,21 @@ fun SearchRecipeList(
 
 @Composable
 private fun SearchRecipeItem(
-    searchRecipeDto: SearchRecipeDto, onClick: (SearchRecipeDto) -> Unit
+    recipe: RecipeDto, onClick: (RecipeDto) -> Unit
 ) {
     Box(modifier = Modifier
         .width(180.dp)
         .height(170.dp)
         .clip(shape = RoundedCornerShape(12.dp))
         .clickable {
-            onClick.invoke(searchRecipeDto)
+            onClick.invoke(recipe)
         }) {
 
         AsyncImage(
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,
-            model = searchRecipeDto.image,
-            contentDescription = "${searchRecipeDto.title} Image"
+            model = recipe.image,
+            contentDescription = "${recipe.title} Image"
         )
 
         Box(
@@ -171,7 +144,7 @@ private fun SearchRecipeItem(
                 modifier = Modifier.padding(12.dp)
             ) {
                 Text(
-                    text = searchRecipeDto.title,
+                    text = recipe.title,
                     color = Color.White,
                     fontSize = 12.sp,
                     fontFamily = poppinsFontFamily,
@@ -190,7 +163,7 @@ private fun SearchRecipeItem(
                         contentDescription = "Clock Icon"
                     )
                     Text(
-                        text = searchRecipeDto.readyInMinutes.toString() + " min",
+                        text = recipe.readyInMinutes.toString() + " min",
                         color = Color.White,
                         fontSize = 10.sp,
                         fontFamily = poppinsFontFamily,

@@ -1,7 +1,8 @@
 package com.devspace.myapplication.search.data
 
-import com.devspace.myapplication.SearchRecipeDto
+import com.devspace.myapplication.common.RecipeDto
+
 
 data class SearchRecipeResponse(
-    val results: List<SearchRecipeDto>
+    val results: List<RecipeDto>
 )
