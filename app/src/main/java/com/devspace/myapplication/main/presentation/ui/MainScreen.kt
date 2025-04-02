@@ -35,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -78,8 +79,8 @@ fun MainScreen(navHostController: NavHostController, mainScreenViewModel: MainSc
 @Composable
 fun MainContent(
     popularRecipes: List<RecipeDto>,
-    recipes: List<RecipeDto>,
-    onClick: (RecipeDto) -> Unit,
+    recipes: MainUiState,
+    onClick: (MainUiData) -> Unit,
     onSearchClicked: (String) -> Unit
 ) {
     Column(
@@ -90,12 +91,12 @@ fun MainContent(
 
         var query by remember { mutableStateOf("") }
 
-        PopularSession(
-            label0 = "Discover your\nfavorite recipes!",
-            label1 = "Popular recipes",
-            recipes = popularRecipes,
-            onClick = onClick
-        )
+//        PopularSession(
+//            label0 = "Discover your\nfavorite recipes!",
+//            label1 = "Popular recipes",
+//            recipes = popularRecipes,
+//            onClick = onClick
+//        )
         SearchSession(
             query = query, onQueryChange = { newQuery ->
                 query = newQuery
@@ -103,14 +104,14 @@ fun MainContent(
             onSearchClicked = onSearchClicked
         )
         RecipeSession(
-            label = "All recipes", recipes = recipes, onClick = onClick
+            label = "All recipes", mainUiState = recipes, onClick = onClick
         )
     }
 }
 
 @Composable
-fun PopularSession(
-    label0: String, label1: String, recipes: List<RecipeDto>, onClick: (RecipeDto) -> Unit
+private fun PopularSession(
+    label0: String, label1: String, recipes: List<MainUiData>, onClick: (MainUiData) -> Unit
 ) {
 
     Column(
@@ -163,8 +164,8 @@ fun SearchSession(
 }
 
 @Composable
-fun RecipeSession(
-    label: String, recipes: List<RecipeDto>, onClick: (RecipeDto) -> Unit
+private fun RecipeSession(
+    label: String, mainUiState: MainUiState, onClick: (MainUiData) -> Unit
 ) {
     Text(
         modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 16.dp),
@@ -173,13 +174,29 @@ fun RecipeSession(
         fontWeight = FontWeight.Medium,
         text = label
     )
-    RecipeList(
-        recipes = recipes, onClick = onClick
-    )
+    if (mainUiState.isLoading) {
+
+    } else if (mainUiState.isError){
+        Column (
+            Modifier.padding(start = 20.dp)
+        ) {
+            Text(
+                fontSize = 15.sp,
+                color = Color.Gray,
+                fontFamily = poppinsFontFamily,
+                fontWeight = FontWeight.Medium,
+                text = mainUiState.errorMessage ?: ""
+            )
+        }
+    } else {
+        RecipeList(
+            recipes = mainUiState.dataList, onClick = onClick
+        )
+    }
 }
 
 @Composable
-private fun RecipeList(recipes: List<RecipeDto>, onClick: (RecipeDto) -> Unit) {
+private fun RecipeList(recipes: List<MainUiData>, onClick: (MainUiData) -> Unit) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         modifier = Modifier
@@ -200,7 +217,7 @@ private fun RecipeList(recipes: List<RecipeDto>, onClick: (RecipeDto) -> Unit) {
 
 @Composable
 fun RecipeItem(
-    recipe: RecipeDto, onClick: (RecipeDto) -> Unit
+    recipe: MainUiData, onClick: (MainUiData) -> Unit
 ) {
     Box(modifier = Modifier
         .width(180.dp)
@@ -259,55 +276,55 @@ fun RecipeItem(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun MainScreenPreview() {
-    EasyRecipesTheme {
-        val dummyRecipes = listOf(
-            RecipeDto(
-                1,
-                "Recipe 1",
-                "description here",
-                30,
-                "https://spoonacular.com/recipeImages/634028-556x370.jpg"
-            ), RecipeDto(
-                2,
-                "Recipe 2",
-                "description here",
-                30,
-                "https://spoonacular.com/recipeImages/634028-556x370.jpg"
-            ), RecipeDto(
-                3,
-                "Recipe 3",
-                "description here",
-                30,
-                "https://spoonacular.com/recipeImages/634028-556x370.jpg"
-            ), RecipeDto(
-                4,
-                "Recipe 4",
-                "description here",
-                30,
-                "https://spoonacular.com/recipeImages/634028-556x370.jpg"
-            ), RecipeDto(
-                5,
-                "Recipe 5",
-                "description here",
-                30,
-                "https://spoonacular.com/recipeImages/634028-556x370.jpg"
-            ), RecipeDto(
-                6,
-                "Recipe 6",
-                "description here",
-                30,
-                "https://spoonacular.com/recipeImages/634028-556x370.jpg"
-            )
-        )
-        PopularSession(
-            label0 = "Discover your\nfavorite recipes!",
-            label1 = "Popular recipes",
-            recipes = dummyRecipes
-        ) {
-
-        }
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//private fun MainScreenPreview() {
+//    EasyRecipesTheme {
+//        val dummyRecipes = listOf(
+//            RecipeDto(
+//                1,
+//                "Recipe 1",
+//                "description here",
+//                30,
+//                "https://spoonacular.com/recipeImages/634028-556x370.jpg"
+//            ), RecipeDto(
+//                2,
+//                "Recipe 2",
+//                "description here",
+//                30,
+//                "https://spoonacular.com/recipeImages/634028-556x370.jpg"
+//            ), RecipeDto(
+//                3,
+//                "Recipe 3",
+//                "description here",
+//                30,
+//                "https://spoonacular.com/recipeImages/634028-556x370.jpg"
+//            ), RecipeDto(
+//                4,
+//                "Recipe 4",
+//                "description here",
+//                30,
+//                "https://spoonacular.com/recipeImages/634028-556x370.jpg"
+//            ), RecipeDto(
+//                5,
+//                "Recipe 5",
+//                "description here",
+//                30,
+//                "https://spoonacular.com/recipeImages/634028-556x370.jpg"
+//            ), RecipeDto(
+//                6,
+//                "Recipe 6",
+//                "description here",
+//                30,
+//                "https://spoonacular.com/recipeImages/634028-556x370.jpg"
+//            )
+//        )
+//        PopularSession(
+//            label0 = "Discover your\nfavorite recipes!",
+//            label1 = "Popular recipes",
+//            recipes = dummyRecipes
+//        ) {
+//
+//        }
+//    }
+//}

@@ -24,24 +24,28 @@ data class RecipeDetailViewModel(
     fun fetchRecipeDetail(recipeId: String) {
         if (_uiRecipeDetail.value == null) {
             viewModelScope.launch(Dispatchers.IO) {
-                val response = detailService.getRecipeInfo(recipeId)
-                if (response.isSuccessful) {
-                    _uiRecipeDetail.value = response.body()
-                } else {
-                    Log.d("MainActivity", "Request Error :: ${response.errorBody()}")
+                try {
+                    val response = detailService.getRecipeInfo(recipeId)
+                    if (response.isSuccessful) {
+                        _uiRecipeDetail.value = response.body()
+                    } else {
+                        Log.d("MainActivity", "Request Error :: ${response.errorBody()}")
+                    }
+                } catch (ex: Exception) {
+                    ex.printStackTrace()
                 }
             }
         }
     }
 
-fun cleanRecipeId() {
-    viewModelScope.launch {
-        delay(1000)
-        _uiRecipeDetail.value = null
+    fun cleanRecipeId() {
+        viewModelScope.launch {
+            delay(1000)
+            _uiRecipeDetail.value = null
+        }
     }
-}
 
-    companion object{
+    companion object {
         val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {

@@ -8,10 +8,13 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import com.devspace.myapplication.common.RecipeDto
 import com.devspace.myapplication.common.RetrofitClient
 import com.devspace.myapplication.main.data.RecipeService
+import com.devspace.myapplication.main.presentation.ui.MainUiData
+import com.devspace.myapplication.main.presentation.ui.MainUiState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.net.UnknownHostException
 
 data class MainScreenViewModel(
     private val recipeService: RecipeService
@@ -20,8 +23,8 @@ data class MainScreenViewModel(
     private var _uiPopularRecipes = MutableStateFlow<List<RecipeDto>>(emptyList())
     val uiPopularRecipes: StateFlow<List<RecipeDto>> = _uiPopularRecipes
 
-    private var _uiRandomRecipes = MutableStateFlow<List<RecipeDto>>(emptyList())
-    val uiRandomRecipes: StateFlow<List<RecipeDto>> = _uiRandomRecipes
+    private var _uiRandomRecipes = MutableStateFlow(MainUiState())
+    val uiRandomRecipes: StateFlow<MainUiState> = _uiRandomRecipes
 
     init {
         fetchPopularRecipes()
@@ -33,34 +36,61 @@ data class MainScreenViewModel(
             val recipesID = listOf(650855, 637932, 664636)
             val fetchedRecipes = mutableListOf<RecipeDto>()
             recipesID.forEach { id ->
-                val response = recipeService.getRecipeId(id.toString())
-                if (response.isSuccessful) {
-                    response.body()?.let { fetchedRecipes.add(it) }
-                    if (fetchedRecipes.size == recipesID.size) {
-                        _uiPopularRecipes.value = fetchedRecipes.toList()
+                try {
+                    val response = recipeService.getRecipeId(id.toString())
+                    if (response.isSuccessful) {
+                        response.body()?.let { fetchedRecipes.add(it) }
+                        if (fetchedRecipes.size == recipesID.size) {
+                            _uiPopularRecipes.value = fetchedRecipes.toList()
+                        }
+                    } else {
+                        Log.d("MainActivity", "Request Error :: ${response.errorBody()}")
                     }
-                } else {
-                    Log.d("MainActivity", "Request Error :: ${response.errorBody()}")
+                } catch (ex: Exception) {
+                    ex.printStackTrace()
                 }
             }
         }
     }
 
     private fun fetchGetRandomRecipes() {
+        _uiRandomRecipes.value = MainUiState(isLoading = true)
         viewModelScope.launch(Dispatchers.IO) {
-            val response = recipeService.getRandomRecipes()
-            if (response.isSuccessful) {
-                val recipes = response.body()?.recipes
-                if (recipes != null) {
-                    _uiRandomRecipes.value = recipes
+            try {
+                val response = recipeService.getRandomRecipes()
+                if (response.isSuccessful) {
+                    val recipes = response.body()?.recipes
+                    if (recipes != null) {
+                        val recipeUiDataList = recipes.map { recipeDto ->
+                            MainUiData(
+                                id = recipeDto.id,
+                                title = recipeDto.title,
+                                summary = recipeDto.summary,
+                                readyInMinutes = recipeDto.readyInMinutes,
+                                image = recipeDto.image
+                            )
+                        }
+                        _uiRandomRecipes.value = MainUiState(dataList = recipeUiDataList)
+                    }
+                } else {
+                    _uiRandomRecipes.value = MainUiState(isError = true)
+                    Log.d("MainActivity", "Request Error :: ${response.errorBody()}")
                 }
-            } else {
-                Log.d("MainActivity", "Request Error :: ${response.errorBody()}")
+            } catch (ex: Exception) {
+                ex.printStackTrace()
+                if (ex is UnknownHostException){
+                    _uiRandomRecipes.value = MainUiState(
+                        isError = true,
+                        errorMessage = "No internet connection"
+                    )
+                } else {
+                    _uiRandomRecipes.value = MainUiState(isError = true)
+                }
             }
         }
     }
 
-    companion object{
+    companion object {
         val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {

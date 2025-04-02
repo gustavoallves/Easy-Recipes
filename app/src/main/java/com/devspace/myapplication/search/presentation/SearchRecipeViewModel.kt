@@ -1,7 +1,7 @@
 package com.devspace.myapplication.search.presentation
 
 import android.util.Log
-    import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
@@ -22,12 +22,16 @@ data class SearchRecipeViewModel(
 
     fun fetchSearchRecipe(query: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val response = searchService.searchRecipes(query)
-            if (response.isSuccessful) {
-                Log.d("API_SEARCH_RESPONSE", "API_RESPONSE: ${response.body()}")
-                _uiSearchRecipe.value = response.body()?.results ?: emptyList()
-            } else {
-                Log.d("MainActivity", "Request Error :: ${response.errorBody()}")
+            try {
+                val response = searchService.searchRecipes(query)
+                if (response.isSuccessful) {
+                    Log.d("API_SEARCH_RESPONSE", "API_RESPONSE: ${response.body()}")
+                    _uiSearchRecipe.value = response.body()?.results ?: emptyList()
+                } else {
+                    Log.d("MainActivity", "Request Error :: ${response.errorBody()}")
+                }
+            } catch (ex: Exception) {
+                ex.printStackTrace()
             }
         }
     }
@@ -42,6 +46,4 @@ data class SearchRecipeViewModel(
             }
         }
     }
-
-
 }
